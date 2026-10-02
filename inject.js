@@ -33,6 +33,23 @@
     return null;
   }
 
+  function mergeGifs(orig, tenor, match) {    
+    let gifArray = 'gif_search_slice';
+    if (match.action === 'trending') gifArray = 'gif_enumerate_category_slice';
+    
+    const origGifs = orig.data[gifArray]?.items;
+    const tenorGifs = tenor.data[gifArray].items;
+        
+    if (origGifs.length) {
+      tenor.data[gifArray].items = Array.from(
+          { length: Math.max(tenorGifs.length, origGifs.length) },
+          (_, i) => [tenorGifs[i], origGifs[i]]
+        ).flat();
+    }
+
+    return tenor;
+  }
+
   // Intercept fetch requests (for Chat)
   const _fetch = window.fetch;
   window.fetch = async function (input, init) {
@@ -40,8 +57,13 @@
     const match = matchUrl(url);
     if (!match) return _fetch.apply(this, arguments);
 
-    return requestTenor(match).then((payload) => {
-      const text = JSON.stringify(payload);
+    const origFetch = await _fetch.apply(this, arguments);
+    const origResponse = await origFetch.json();
+    
+    return requestTenor(match).then((tenorResponse) => {
+      const result = mergeGifs(origResponse, tenorResponse, match);
+
+      const text = JSON.stringify(result);
       const response = new Response(text, {
         status: 200,
         statusText: "OK",
