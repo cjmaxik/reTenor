@@ -65,7 +65,7 @@ function transformGifItems(tenor) {
     const { gif, thumbnail_images } = selectBestMediaForResult(r);
     const item = {
       __typename: "GifItem",
-      alt_text: r.title || "",
+      alt_text: r.title || r.h1_title || r.content_description || "",
       full_image: {
         __typename: "GifImage",
         height: gif.height,
