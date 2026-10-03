@@ -42,9 +42,9 @@
         
     if (origGifs.length) {
       tenor.data[gifArray].items = Array.from(
-          { length: Math.max(tenorGifs.length, origGifs.length) },
-          (_, i) => [tenorGifs[i], origGifs[i]]
-        ).flat();
+        { length: Math.max(tenorGifs.length, origGifs.length) },
+        (_, i) => [tenorGifs[i], origGifs[i]].filter(Boolean)
+      ).flat();
     }
 
     return tenor;
